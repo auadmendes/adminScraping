@@ -24,16 +24,8 @@ interface DraftkingsRequest extends NextApiRequest {
 
 export default async function handler(req: DraftkingsRequest, res: NextApiResponse) {
 
-
-  //const url = req.body.url
-  //const mfa = req.body.mfa
-  //const refs = req.body.refs
-  
-  const user = req.body.user
-  const password = req.body.password
-
-  const USER_LOGIN = user
-  const USER_PASSWORD = password
+  const USER_LOGIN = req.body.user
+  const USER_PASSWORD = req.body.password
 
   let browser = null;
 
@@ -69,79 +61,103 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
     await page.keyboard.press('Enter', { delay: 100 })
 
 
-    for (let i = 0; i < ptxArray.length; i++) {
-      let ref = ptxArray[i]
-      let trIds = ''
-      let trxType = ''
-      let trxMerchantName = ''
+    // beginning of FOR
 
-    await page.waitForSelector('input[name="ppTransactionId"]')
-    await page.type('input[name="ppTransactionId"]', ref)
+    // for (let i = 0; i < ptxArray.length; i++) {
+    //   let ref = ptxArray[i]
+    //   let trIds = ''
+    //   let trxType = ''
+    //   let trxMerchantName = ''
 
-    await page.keyboard.press('Enter', { delay: 100 })
+    // await page.waitForSelector('input[name="ppTransactionId"]')
+    // await page.type('input[name="ppTransactionId"]', ref)
 
-    await page.waitForSelector('.break-all', { delay: 100 })
+    // await page.keyboard.press('Enter', { delay: 100 })
 
-    const referenceId = await page.$eval(
-      '.break-all',
-      el => el.textContent
-    )
+    // await page.waitForSelector('.break-all', { delay: 100 })
 
-    trxType = await page.$$eval('table tr td', anchors => {
-      return anchors.map(links => links.textContent).slice(5, 6)
-    })
+    // const referenceId = await page.$eval(
+    //   '.break-all',
+    //   el => el.textContent
+    // )
 
-    trxMerchantName = await page.$$eval('table tr td', anchors => {
-      return anchors.map(links => links.textContent).slice(13, 14)
-    })
+    // trxType = await page.$$eval('table tr td', anchors => {
+    //   return anchors.map(links => links.textContent).slice(5, 6)
+    // })
 
-    if (trxType[0] === 'External') {
-      trIds = await page.$$eval('table tr td a', anchors => {
-        return anchors.map(links => links.textContent).slice(7, 8)
-      })
-    } else {
-      trIds = await page.$$eval('table tr td a', anchors => {
-        return anchors.map(links => links.textContent).slice(0, 1)
-      })
-    }
+    // trxMerchantName = await page.$$eval('table tr td', anchors => {
+    //   return anchors.map(links => links.textContent).slice(13, 14)
+    // })
 
-    const amount = await page.$$eval('table tr td', anchors => {
-      return anchors.map(links => links.textContent).slice(15, 16)
-    })
+    // if (trxType[0] === 'External') {
+    //   trIds = await page.$$eval('table tr td a', anchors => {
+    //     return anchors.map(links => links.textContent).slice(7, 8)
+    //   })
+    // } else {
+    //   trIds = await page.$$eval('table tr td a', anchors => {
+    //     return anchors.map(links => links.textContent).slice(0, 1)
+    //   })
+    // }
 
-    // const objectRef = {
-    // merchantName: trxMerchantName[0],
-    // transactionId: trIds[0],
-    // merchantReference: referenceId,
-    // amount: 'USD ' + refs[i][3],
-    // reasonCode: 'Insufficient Funds',
-    // reason: 'R01',
+    // const amount = await page.$$eval('table tr td', anchors => {
+    //   return anchors.map(links => links.textContent).slice(15, 16)
+    // })
+
+    // infoArray.push({
+    //   merchantName: trxMerchantName[0],
+    //   transactionId: trIds[0],
+    //   merchantReference: referenceId,
+    //   amount: 'USD ' + req.body.refs[i][3],
+    //   reasonCode: 'Insufficient Funds',
+    //   reason: 'R01',
+    // } as TransactionInfo)
+
+    // await page.waitForSelector('input[name="ppTransactionId"]')
+
+    // const ppTransactionId = await page.waitForSelector(
+    //   'input[name="ppTransactionId"]'
+    // )
+
+    // await ppTransactionId.click({ clickCount: 3 })
+    // await ppTransactionId.press('Backspace')
 
     // }
 
+    //end of FOR
+
+
+    //
+
+    for (const ref of ptxArray) {
+      await page.waitForSelector('input[name="ppTransactionId"]')
+      await page.type('input[name="ppTransactionId"]', ref)
+      await page.keyboard.press('Enter', { delay: 100 })
+      await page.waitForSelector('.break-all', { delay: 100 })
     
-    //infoArray.push(objectRef)
-    infoArray.push({
-      merchantName: trxMerchantName[0],
-      transactionId: trIds[0],
-      merchantReference: referenceId,
-      amount: 'USD ' + req.body.refs[i][3],
-      reasonCode: 'Insufficient Funds',
-      reason: 'R01',
-    } as TransactionInfo)
-
-    await page.waitForSelector('input[name="ppTransactionId"]')
-
-    const ppTransactionId = await page.waitForSelector(
-      'input[name="ppTransactionId"]'
-    )
-
-    await ppTransactionId.click({ clickCount: 3 })
-    await ppTransactionId.press('Backspace')
-
+      const referenceId = await page.$eval('.break-all', el => el.textContent)
+      const trxType = await page.$$eval('table tr td', anchors => anchors.map(links => links.textContent).slice(5, 6))
+      const trxMerchantName = await page.$$eval('table tr td', anchors => anchors.map(links => links.textContent).slice(13, 14))
+      const trIds = await page.$$eval('table tr td a', anchors => {
+        const sliceStart = (anchors[5].textContent === 'External') ? 7 : 0
+        return anchors.map(links => links.textContent).slice(sliceStart, sliceStart + 1)
+      })
+      const amount = await page.$$eval('table tr td', anchors => anchors.map(links => links.textContent).slice(15, 16))
+    
+      infoArray.push({
+        merchantName: trxMerchantName[0],
+        transactionId: trIds[0],
+        merchantReference: referenceId,
+        amount: 'USD ' + req.body.refs[ptxArray.indexOf(ref)][3],
+        reasonCode: 'Insufficient Funds',
+        reason: 'R01',
+      })
+    
+      const ppTransactionId = await page.waitForSelector('input[name="ppTransactionId"]')
+      await ppTransactionId.click({ clickCount: 3 })
+      await ppTransactionId.press('Backspace')
     }
 
-    //result = await page.title();
+    //
 
   } catch (error) {
     console.log('Olha o erro' + error)
