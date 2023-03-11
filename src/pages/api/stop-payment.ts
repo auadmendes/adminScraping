@@ -7,13 +7,20 @@ import { getOptions } from "../../_lib/chromiumOption";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
-  const USER_LOGIN = process.env.ADMIN_CONSOLE_LOGIN
-  const USER_PASSWORD = process.env.ADMIN_CONSOLE_PASS
+  //console.log('MEU TEST >>>>>>>>>>>')
+
+  // const USER_LOGIN = process.env.ADMIN_CONSOLE_LOGIN
+  // const USER_PASSWORD = process.env.ADMIN_CONSOLE_PASS
   const pageDetails = "https://paywithmybank.com/admin-console/transactions/details/"
   const url = req.body.url
   const mfa = req.body.mfa
   const refs = req.body.refs
 
+  const user = req.body.user
+  const password = req.body.password
+
+  const USER_LOGIN = user
+  const USER_PASSWORD = password
   
   let result = null;
   let browser = null;
@@ -39,6 +46,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let page = await browser.newPage();
 
     await page.goto(url);
+    
+   
 
     await page.waitForSelector('input[name="username"]')
     await page.type('input[name="username"]', `${USER_LOGIN}`)
@@ -51,24 +60,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   
     await page.keyboard.press('Enter', { delay: 100 })
 
-    for (let i = 0; i < ptxArray.length; i++) {
+    
+      for (let i = 0; i < ptxArray.length; i++) {
       let ref = ptxArray[i]
       let trIds = ''
       let trxType = ''
       let trxMerchantName = ''
 
-    await page.waitForSelector('input[name="ppTransactionId"]')
+      //console.log('for >>>>>>', ref)
 
+    await page.waitForSelector('input[name="ppTransactionId"]')
     await page.type('input[name="ppTransactionId"]', ref)
 
     await page.keyboard.press('Enter', { delay: 300 })
 
-    await page.waitForSelector('.merchant-reference', { delay: 100 })
+    await page.waitForSelector('.break-all', { delay: 100 })
 
-    const referenceId = await page.$eval(
-      '.merchant-reference',
-      el => el.textContent
-    )
+    const referenceId = await page.$eval('.break-all', el => el.textContent)
 
     trxType = await page.$$eval('table tr td', anchors => {
       return anchors.map(links => links.textContent).slice(5, 6)
@@ -88,9 +96,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
     }
 
+
+
     const amount = await page.$$eval('table tr td', anchors => {
       return anchors.map(links => links.textContent).slice(15, 16)
     })
+
+    //console.log(amount)
 
     await page.goto(`${pageDetails}${trIds}`, {
       waitUntil: 'load',
@@ -104,25 +116,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     )
 
-    const trustlyUserName = await page.$$eval(
-      '#fi-retrieved-info > .table-hover tbody tr td',
-      anchors => {
-        return anchors.map(links => links.textContent).slice(7, 8)
-      }
-    )
+    const trustlyUserName = await page.$$eval('#info .table-hover tr td', anchors => {
+      return anchors.map(items => items.textContent).slice(7, 8)
+    })
+
 
     const objectRef = {
     customerName: trustlyUserName[0],
-    merchantName: trxMerchantName,
-    reason: refs[i][4],
+    merchantName: trxMerchantName[0],
+    reason: refs[i][4] + ' ' + refs[i][5],
     amount: refs[i][3],
     pasClerkPtx: ref,
     refID: refs[i][6],
     merchantReference: referenceId,
     transactionId: trIds[0],
-    signatureRef: signatureRef,
-    reasonCode: refs[i][5],
-    log: refs[i][7],
+    signatureRef: signatureRef[0].trim(),
+    amount_usd: 'USD ' + refs[i][3],
+    
+    //log: refs[i][7],
     }
 
   // 'DRAFTKINGS', 0
@@ -137,6 +148,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // '223144426948' 10
     
     infoArray.push(objectRef)
+    //console.log(infoArray, ' Info >>>>')
 
     await page.goBack()
 

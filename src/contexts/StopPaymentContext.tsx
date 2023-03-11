@@ -20,6 +20,8 @@ interface ApiProps {
   url: string;
   mfa: string;
   refs: Reference[];
+  user: string;
+  password: string;
 }
 
 interface Merchant {
@@ -46,7 +48,7 @@ interface StopPaymentContextType {
   stopPayment: Merchant[];
   readSheet: (sheet: string) => void;
   createFiltered: (sheet: string) => void;
-  createVipSheets: (list: string) => void;
+  //createVipSheets: (list: string) => void;
   getDraftkingsVip: (data: ApiProps) => void;
   getStopPayment: (data: ApiProps) => void;
 }
@@ -70,6 +72,8 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
   const filteredItems = []
   //const firstAndDraftkingsBind = []
 
+
+  // This method read the file and separate the VIPs from Draftkings
   function readSheet(sheet: any) {
     const reader = new FileReader()
 
@@ -81,7 +85,7 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
       const data = XLSX.utils.sheet_to_json(ws, { header: 1 })
 
       data.map(item => {
-        if (item[1] === 44045295) {
+        if (item[1] === 44048549) {
           //console.log(item[9])
 
           refs.push([
@@ -103,12 +107,8 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
     reader.readAsBinaryString(sheet);
   }
 
-  function createVipSheets(list: any) {
-    setVipList(list)
-  }
-
   function createFiltered(sheet: any) {
-    console.log('createFilter' + sheet)
+    //console.log('createFilter' + sheet)
     const reader = new FileReader()
 
     reader.onload = (evt) => {
@@ -231,9 +231,9 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
     reader.readAsBinaryString(sheet);
   }
 
-  async function getStopPayment({ url, mfa, refs }: ApiProps) {
+  async function getStopPayment({ url, mfa, refs, user, password }: ApiProps) {
 
-    const response = await fetch('http://localhost:3000/api/stop-payment', {
+    const response = await fetch('/api/stop-payment', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -242,18 +242,21 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
         url,
         mfa,
         refs,
+        user,
+        password
       })
     })
 
     const data = await response.json()
     setStopPayment(data)
 
-    console.log('Response Stop Payment.......................................')
-    console.log(data)
+    //console.log('Response Stop Payment.......................................')
+    console.log(data, ' >>>>>>>>>')
   }
-  async function getDraftkingsVip({ url, mfa, refs }: ApiProps) {
 
-    const response = await fetch('http://localhost:3000/api/draftkings_vip', {
+  async function getDraftkingsVip({ url, mfa, refs, user, password }: ApiProps) {
+
+    const response = await fetch('/api/draftkings_vip', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -262,16 +265,18 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
         url,
         mfa,
         refs,
+        user,
+        password
       })
     })
 
     const data = await response.json()
     setMerchantVip(data)
 
-    console.log('Response')
+    //console.log('Response')
     console.log(data)
-  }
 
+  }
 
   return (
     <StopPaymentContext.Provider
@@ -284,7 +289,7 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
         stopPayment,
         readSheet,
         createFiltered,
-        createVipSheets,
+        //createVipSheets,
         getDraftkingsVip,
         getStopPayment
       }}

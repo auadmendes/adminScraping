@@ -14,7 +14,7 @@ export function readFile(sheet: any) {
     const data = XLSX.utils.sheet_to_json(ws, { header: 1 })
 
     data.forEach(function (item, index) {
-      console.log(item[1])
+      //console.log(item[1])
       if (item[0] === 'BET365') {
         //console.log(item[5])
         referencePTX.push(item[8])
@@ -26,5 +26,5 @@ export function readFile(sheet: any) {
 
   reader.readAsBinaryString(sheet);
 
-  console.log(referencePTX)
+  //console.log(referencePTX)
 }

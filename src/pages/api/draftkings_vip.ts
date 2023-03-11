@@ -1,17 +1,21 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import puppeteer, { Page } from 'puppeteer-core'
+import { useState } from "react";
 import { getOptions } from "../../_lib/chromiumOption";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
-  const USER_LOGIN = process.env.ADMIN_CONSOLE_LOGIN
-  const USER_PASSWORD = process.env.ADMIN_CONSOLE_PASS
-
+  
   const url = req.body.url
   const mfa = req.body.mfa
   const refs = req.body.refs
+  
+  const user = req.body.user
+  const password = req.body.password
 
+  const USER_LOGIN = user
+  const USER_PASSWORD = password
   
   let result = null;
   let browser = null;
@@ -29,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   refs.map(item => {
     aArray.push(item[6])
-    console.log(item[6])
+   
   })
 
   const ptxArray = aArray
@@ -58,24 +62,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   
     await page.keyboard.press('Enter', { delay: 100 })
 
+    //console.log(ptxArray, ' >>>>>>')
+
     for (let i = 0; i < ptxArray.length; i++) {
       let ref = ptxArray[i]
       let trIds = ''
       let trxType = ''
       let trxMerchantName = ''
 
-      console.log('refs[2]')
-      console.log(refs[i])
+      // console.log('refs[2] Draftkings')
+      // console.log(refs[i])
 
     await page.waitForSelector('input[name="ppTransactionId"]')
     await page.type('input[name="ppTransactionId"]', ref)
 
     await page.keyboard.press('Enter', { delay: 100 })
 
-    await page.waitForSelector('.merchant-reference', { delay: 100 })
+    await page.waitForSelector('.break-all', { delay: 100 })
 
     const referenceId = await page.$eval(
-      '.merchant-reference',
+      '.break-all',
       el => el.textContent
     )
 
@@ -101,15 +107,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return anchors.map(links => links.textContent).slice(15, 16)
     })
 
+
+
     const objectRef = {
-    merchantName: trxMerchantName,
+    merchantName: trxMerchantName[0],
     transactionId: trIds[0],
     merchantReference: referenceId,
-    amount: refs[i][3],
-    reason: refs[i][4],
-    reasonCode: refs[i][5],
-    log: refs[i][7],
-    pasClerkPtx: ref
+    amount: 'USD ' + refs[i][3],
+    reasonCode: 'Insufficient Funds',
+    reason: 'R01',
+
     }
 
     
@@ -125,33 +132,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await ppTransactionId.press('Backspace')
 
     }
-    // await page.waitForFunction(() => {
-    //   const mfa = document.getElementById('mfa_code').textContent
-    //   return mfa.length === 6
-    // })
-  
-    
 
-  //await page.type('input[name="mfa_code"]', `515623`, { delay: 50 })
-
-  // await page.waitForFunction(() => {
-  //   console.log('Meu test')
-  // })
-
-  // setTimeout(() => {
-  //   console.log("Delayed for 1 second.");
-  // }, 5000)
-
-  // await page.waitForFunction(() => {
-  //   const mfa = document.getElementById('mfa_code').nodeValue 
-  //   return mfa.length === 6
-
-  // });
-
-  //await page.keyboard.press('Enter', { delay: 100 })
   
     result = await page.title();
-    //createVipSheets([infoArray])
+
   
 
   } catch (error) {
@@ -166,7 +150,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   await browser.close()
 
-  console.log(infoArray)
+  //console.log(infoArray)
 
    //res.status(200).json({infoArray})
   res.status(201).send(infoArray)
