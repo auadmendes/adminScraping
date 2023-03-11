@@ -135,13 +135,13 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
       await page.waitForSelector('.break-all', { delay: 100 })
     
       const referenceId = await page.$eval('.break-all', el => el.textContent)
-      const trxType = await page.$$eval('table tr td', anchors => anchors.map(links => links.textContent).slice(5, 6))
+      // const trxType = await page.$$eval('table tr td', anchors => anchors.map(links => links.textContent).slice(5, 6))
       const trxMerchantName = await page.$$eval('table tr td', anchors => anchors.map(links => links.textContent).slice(13, 14))
       const trIds = await page.$$eval('table tr td a', anchors => {
         const sliceStart = (anchors[5].textContent === 'External') ? 7 : 0
         return anchors.map(links => links.textContent).slice(sliceStart, sliceStart + 1)
       })
-      const amount = await page.$$eval('table tr td', anchors => anchors.map(links => links.textContent).slice(15, 16))
+      // const amount = await page.$$eval('table tr td', anchors => anchors.map(links => links.textContent).slice(15, 16))
     
       infoArray.push({
         merchantName: trxMerchantName[0],
