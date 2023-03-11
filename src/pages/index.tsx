@@ -5,62 +5,12 @@ export default function Home() {
   const { merchantVip, stopPayment } = useContext(StopPaymentContext)
   const [selectedCustomers, setSelectedCustomer] = useState([])
 
-  // let filterCustomer = []
-  // let filterCustomer2 = {}
-
-  // function selectCustomer() {
-
-  //   const formattedCustomers = stopPayment.reduce((total, customer) => {
-  //     const customers = { ...total }
-
-  //     if (!customers[customer.customerName]) {
-  //       customers[customer.customerName] = []
-  //     }
-  //     customers[customer.customerName].push([
-
-  //       (customer.merchantName),
-  //       (customer.amount),
-  //       (customer.reasonCode),
-  //       (customer.pasClerkPtx),
-  //       (customer.refID),
-  //       (customer.merchantReference),
-  //       (customer.transactionId),
-  //       (customer.signatureRef),
-
-  //     ], [])
-
-
-  //     return customers
-  //   }, [])
-
-
-  //   const newCustomers = Object.keys(formattedCustomers).map(customer => {
-  //     return {
-  //       name: customer,
-  //       cases: formattedCustomers[customer],
-  //       total: formattedCustomers[customer].reduce((total, currentAmount) => {
-  //         return total + currentAmount[1]
-  //       }, 0)
-  //     }
-  //   })
-
-
-  //   filterCustomer.push(formattedCustomers)
-  //   ///////////////console.log(newCustomers)
-
-  //   filterCustomer.map(item => {
-  //     ///////console.log(item)
-  //   })
-  //   // console.log(Object.keys(formattedCustomers))
-  // }
 
   return (
     <div className="flex flex-1 items-center justify-center w-screen ">
       <div className="flex-1 pt-8 pl-8 pr-8 flex flex-col w-full overflow-auto">
         <div>
-          {/* <button onClick={selectCustomer} className="h-12 p-4 bg-Trutly mb-4">
-            Download
-          </button> */}
+
         </div>
 
         {stopPayment.length > 0 ? (
