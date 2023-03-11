@@ -1,47 +1,53 @@
 import { NextApiRequest, NextApiResponse } from "next";
-
-import puppeteer, { Page } from 'puppeteer-core'
-import { useState } from "react";
+import puppeteer from 'puppeteer-core'
 import { getOptions } from "../../_lib/chromiumOption";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
-  
-  const url = req.body.url
-  const mfa = req.body.mfa
-  const refs = req.body.refs
+interface TransactionInfo {
+  merchantName: string;
+  transactionId: string;
+  merchantReference: string;
+  amount: string;
+  reasonCode: string;
+  reason: string;
+}
+
+interface DraftkingsRequest extends NextApiRequest {
+  body: {
+    url: string;
+    mfa: string;
+    refs: Array<Array<string>>;
+    user: string;
+    password: string;
+  };
+}
+
+export default async function handler(req: DraftkingsRequest, res: NextApiResponse) {
+
+
+  //const url = req.body.url
+  //const mfa = req.body.mfa
+  //const refs = req.body.refs
   
   const user = req.body.user
   const password = req.body.password
 
   const USER_LOGIN = user
   const USER_PASSWORD = password
-  
-  let result = null;
-  let browser = null;
 
-  const header = [
-    'Merchant',
-    'TransactionID',
-    'Merchant Reference',
-    'warr_amt',
-    'Ret_Reason',
-    'ACH_REASON_CODE'
-  ]
+  let browser = null;
 
   const aArray = []
 
-  refs.map(item => {
+  req.body.refs.map(item => {
     aArray.push(item[6])
    
   })
 
   const ptxArray = aArray
 
- 
-
   const infoArray = []
-  //infoArray.push(header)
+
   try {
 
     const options = await getOptions(true)
@@ -49,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     let page = await browser.newPage();
 
-    await page.goto(url);
+    await page.goto(req.body.url);
 
     await page.waitForSelector('input[name="username"]')
     await page.type('input[name="username"]', `${USER_LOGIN}`)
@@ -58,20 +64,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await page.type('input[name="password"]', `${USER_PASSWORD}`, { delay: 50 })
   
     await page.waitForSelector('input[name="mfa_code"]')
-    await page.type('input[name="mfa_code"]', `${mfa}`, { delay: 50 })
+    await page.type('input[name="mfa_code"]', `${req.body.mfa}`, { delay: 50 })
   
     await page.keyboard.press('Enter', { delay: 100 })
 
-    //console.log(ptxArray, ' >>>>>>')
 
     for (let i = 0; i < ptxArray.length; i++) {
       let ref = ptxArray[i]
       let trIds = ''
       let trxType = ''
       let trxMerchantName = ''
-
-      // console.log('refs[2] Draftkings')
-      // console.log(refs[i])
 
     await page.waitForSelector('input[name="ppTransactionId"]')
     await page.type('input[name="ppTransactionId"]', ref)
@@ -107,20 +109,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return anchors.map(links => links.textContent).slice(15, 16)
     })
 
+    // const objectRef = {
+    // merchantName: trxMerchantName[0],
+    // transactionId: trIds[0],
+    // merchantReference: referenceId,
+    // amount: 'USD ' + refs[i][3],
+    // reasonCode: 'Insufficient Funds',
+    // reason: 'R01',
 
-
-    const objectRef = {
-    merchantName: trxMerchantName[0],
-    transactionId: trIds[0],
-    merchantReference: referenceId,
-    amount: 'USD ' + refs[i][3],
-    reasonCode: 'Insufficient Funds',
-    reason: 'R01',
-
-    }
+    // }
 
     
-    infoArray.push(objectRef)
+    //infoArray.push(objectRef)
+    infoArray.push({
+      merchantName: trxMerchantName[0],
+      transactionId: trIds[0],
+      merchantReference: referenceId,
+      amount: 'USD ' + req.body.refs[i][3],
+      reasonCode: 'Insufficient Funds',
+      reason: 'R01',
+    } as TransactionInfo)
 
     await page.waitForSelector('input[name="ppTransactionId"]')
 
@@ -133,25 +141,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     }
 
-  
-    result = await page.title();
-
-  
+    //result = await page.title();
 
   } catch (error) {
     console.log('Olha o erro' + error)
-    //return callback(error);
+
   } finally {
     if (browser !== null) {
-      //await browser.close();
     }
   }
- //console.log(result)
 
   await browser.close()
 
-  //console.log(infoArray)
-
-   //res.status(200).json({infoArray})
   res.status(201).send(infoArray)
 }
