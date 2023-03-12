@@ -6,9 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "zip": "tsc && 7z a -r function.zip ./dist/* node_modules/",
-    "sendToLambda": "npm run zip && aws s3 cp function.zip s3://chrome-aws && aws lambda update-function-code --function"
+    "lint": "next lint"
   },
   "dependencies": {
     "@types/node": "18.11.9",

@@ -2,16 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import puppeteer from 'puppeteer-core'
 import { getOptions } from "../../_lib/chromiumOption";
 
-
-interface TransactionInfo {
-  merchantName: string;
-  transactionId: string;
-  merchantReference: string;
-  amount: string;
-  reasonCode: string;
-  reason: string;
-}
-
 interface DraftkingsRequest extends NextApiRequest {
   body: {
     url: string;
