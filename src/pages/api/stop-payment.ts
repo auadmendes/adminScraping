@@ -1,16 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import puppeteer, { Page } from 'puppeteer-core'
+import puppeteer from 'puppeteer-core'
 import { getOptions } from "../../_lib/chromiumOption";
 
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
-  //console.log('MEU TEST >>>>>>>>>>>')
 
-  // const USER_LOGIN = process.env.ADMIN_CONSOLE_LOGIN
-  // const USER_PASSWORD = process.env.ADMIN_CONSOLE_PASS
   const pageDetails = "https://paywithmybank.com/admin-console/transactions/details/"
   const url = req.body.url
   const mfa = req.body.mfa
@@ -96,13 +93,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
     }
 
-
-
     const amount = await page.$$eval('table tr td', anchors => {
       return anchors.map(links => links.textContent).slice(15, 16)
     })
-
-    //console.log(amount)
 
     await page.goto(`${pageDetails}${trIds}`, {
       waitUntil: 'load',
@@ -162,34 +155,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await ppTransactionId.press('Backspace')
 
     }
-    // await page.waitForFunction(() => {
-    //   const mfa = document.getElementById('mfa_code').textContent
-    //   return mfa.length === 6
-    // })
-  
-    
 
-  //await page.type('input[name="mfa_code"]', `515623`, { delay: 50 })
-
-  // await page.waitForFunction(() => {
-  //   console.log('Meu test')
-  // })
-
-  // setTimeout(() => {
-  //   console.log("Delayed for 1 second.");
-  // }, 5000)
-
-  // await page.waitForFunction(() => {
-  //   const mfa = document.getElementById('mfa_code').nodeValue 
-  //   return mfa.length === 6
-
-  // });
-
-  //await page.keyboard.press('Enter', { delay: 100 })
-  
     result = await page.title();
-    //createVipSheets([infoArray])
-  
 
   } catch (error) {
     console.log('Olha o erro' + error)
