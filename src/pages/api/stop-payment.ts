@@ -3,14 +3,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import puppeteer from 'puppeteer-core'
 import { getOptions } from "../../_lib/chromiumOption";
 
-interface TransactionInfo {
-  merchantName: string;
-  transactionId: string;
-  merchantReference: string;
-  amount: string;
-  reasonCode: string;
-  reason: string;
-}
 
 interface DraftkingsRequest extends NextApiRequest {
   body: {
@@ -28,14 +20,13 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
 
   let browser = null;
 
-  const aArray = []
+  const ptxArray = []
 
 
   req.body.refs.map(item => {
-    aArray.push(item[8])
+    ptxArray.push(item[8])
   })
 
-  const ptxArray = aArray
 
 
   const infoArray = []
@@ -49,8 +40,7 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
 
     await page.goto(req.body.url);
     
-   
-
+  
     await page.waitForSelector('input[name="username"]')
     await page.type('input[name="username"]', `${req.body.user}`)
   
@@ -61,8 +51,7 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
     await page.type('input[name="mfa_code"]', `${req.body.mfa}`, { delay: 50 })
   
     await page.keyboard.press('Enter', { delay: 100 })
-
-    
+  
     for (let i = 0; i < ptxArray.length; i++) {
       let ref = ptxArray[i]
       let trIds = ''
@@ -105,12 +94,12 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
     const signatureRef = await page.$$eval(
       '#fi-transaction .table-condensed tbody tr td',
       anchors => {
-        return anchors.map(links => links.textContent).slice(7, 8)
+        return anchors.map((links: { textContent: any; }) => links.textContent).slice(7, 8)
       }
     )
 
     const trustlyUserName = await page.$$eval('#info .table-hover tr td', anchors => {
-      return anchors.map(items => items.textContent).slice(7, 8)
+      return anchors.map((items: { textContent: any; }) => items.textContent).slice(7, 8)
     })
 
  
@@ -126,8 +115,6 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
       signatureRef: signatureRef[0].trim(),
       amount_usd: 'USD ' + req.body.refs[i][3],
     })
-
-    infoArray.push(infoArray)
 
     await page.goBack()
 
