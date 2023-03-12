@@ -3,31 +3,36 @@ import { NextApiRequest, NextApiResponse } from "next";
 import puppeteer from 'puppeteer-core'
 import { getOptions } from "../../_lib/chromiumOption";
 
+interface TransactionInfo {
+  merchantName: string;
+  transactionId: string;
+  merchantReference: string;
+  amount: string;
+  reasonCode: string;
+  reason: string;
+}
 
+interface DraftkingsRequest extends NextApiRequest {
+  body: {
+    url: string;
+    mfa: string;
+    refs: Array<Array<string>>;
+    user: string;
+    password: string;
+  };
+}
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-
+export default async function handler(req: DraftkingsRequest, res: NextApiResponse) {
 
   const pageDetails = "https://paywithmybank.com/admin-console/transactions/details/"
-  const url = req.body.url
-  const mfa = req.body.mfa
-  const refs = req.body.refs
 
-  const user = req.body.user
-  const password = req.body.password
-
-  const USER_LOGIN = user
-  const USER_PASSWORD = password
-  
-  let result = null;
   let browser = null;
 
   const aArray = []
 
 
-  refs.map(item => {
+  req.body.refs.map(item => {
     aArray.push(item[8])
-    //console.log(item[8])
   })
 
   const ptxArray = aArray
@@ -42,29 +47,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     let page = await browser.newPage();
 
-    await page.goto(url);
+    await page.goto(req.body.url);
     
    
 
     await page.waitForSelector('input[name="username"]')
-    await page.type('input[name="username"]', `${USER_LOGIN}`)
+    await page.type('input[name="username"]', `${req.body.user}`)
   
     await page.waitForSelector('input[name="password"]')
-    await page.type('input[name="password"]', `${USER_PASSWORD}`, { delay: 50 })
+    await page.type('input[name="password"]', `${req.body.password}`, { delay: 50 })
   
     await page.waitForSelector('input[name="mfa_code"]')
-    await page.type('input[name="mfa_code"]', `${mfa}`, { delay: 50 })
+    await page.type('input[name="mfa_code"]', `${req.body.mfa}`, { delay: 50 })
   
     await page.keyboard.press('Enter', { delay: 100 })
 
     
-      for (let i = 0; i < ptxArray.length; i++) {
+    for (let i = 0; i < ptxArray.length; i++) {
       let ref = ptxArray[i]
       let trIds = ''
       let trxType = ''
       let trxMerchantName = ''
 
-      //console.log('for >>>>>>', ref)
 
     await page.waitForSelector('input[name="ppTransactionId"]')
     await page.type('input[name="ppTransactionId"]', ref)
@@ -93,10 +97,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
     }
 
-    const amount = await page.$$eval('table tr td', anchors => {
-      return anchors.map(links => links.textContent).slice(15, 16)
-    })
-
     await page.goto(`${pageDetails}${trIds}`, {
       waitUntil: 'load',
       timeout: 0
@@ -113,35 +113,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return anchors.map(items => items.textContent).slice(7, 8)
     })
 
+ 
+    infoArray.push({
+      customerName: trustlyUserName[0],
+      merchantName: trxMerchantName[0],
+      reason: req.body.refs[i][4] + ' ' + req.body.refs[i][5],
+      amount: req.body.refs[i][3],
+      pasClerkPtx: ref,
+      refID: req.body.refs[i][6],
+      merchantReference: referenceId,
+      transactionId: trIds[0],
+      signatureRef: signatureRef[0].trim(),
+      amount_usd: 'USD ' + req.body.refs[i][3],
+    })
 
-    const objectRef = {
-    customerName: trustlyUserName[0],
-    merchantName: trxMerchantName[0],
-    reason: refs[i][4] + ' ' + refs[i][5],
-    amount: refs[i][3],
-    pasClerkPtx: ref,
-    refID: refs[i][6],
-    merchantReference: referenceId,
-    transactionId: trIds[0],
-    signatureRef: signatureRef[0].trim(),
-    amount_usd: 'USD ' + refs[i][3],
-    
-    //log: refs[i][7],
-    }
-
-  // 'DRAFTKINGS', 0
-  // 44045960, 1
-  // 'Davison Avery', 2
-  // 500, 3
-  // 'Hold on Funds', 4
-  // 'R16', 5
-  // 20221107, 6
-  // 44875, 8
-  // 'ptx-HNHkHX0Osarr0a2udgomy_t4', 9
-  // '223144426948' 10
-    
-    infoArray.push(objectRef)
-    //console.log(infoArray, ' Info >>>>')
+    infoArray.push(infoArray)
 
     await page.goBack()
 
@@ -156,8 +142,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     }
 
-    result = await page.title();
-
   } catch (error) {
     console.log('Olha o erro' + error)
     //return callback(error);
@@ -166,12 +150,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       //await browser.close();
     }
   }
- //console.log(result)
+
 
   await browser.close()
 
-  //console.log(infoArray)
 
-   //res.status(200).json({infoArray})
   res.status(201).send(infoArray)
 }
