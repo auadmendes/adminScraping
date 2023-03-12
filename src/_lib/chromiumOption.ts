@@ -21,7 +21,7 @@ import chrome from "chrome-aws-lambda";
       options = {
         args: [],
         executablePath: exePath,
-        headless: true,
+        headless: false,
       } 
     } else {
       options = {
