@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 export default function Login() {
   const [user, setUser] = useState('')
   const [password, setPassword] = useState('')
-  const [localData, setLocalData] = useState({})
+  const [localData, setLocalData] = useState()
 
   const [userLocal, setUserLocal] = useState('')
   //const [passwordLocal, setPasswordLocal] = useState('')
@@ -31,7 +31,7 @@ export default function Login() {
       setLocalData(userData.user)
 
     } catch (error) {
-      return null
+      setLocalData(null)
     }
   }, [])
 
