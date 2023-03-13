@@ -6,12 +6,12 @@ export default function Login() {
   const [localData, setLocalData] = useState({})
 
   const [userLocal, setUserLocal] = useState('')
-  const [passwordLocal, setPasswordLocal] = useState('')
+  //const [passwordLocal, setPasswordLocal] = useState('')
 
   function handleLogin() {
     event.preventDefault()
 
-    if (!userLocal) {
+    if (!localData) {
       const userData = {
         user: user,
         password: password
@@ -25,9 +25,14 @@ export default function Login() {
   }
 
   useEffect(() => {
-    const storageData = localStorage.getItem('@admin-console-user')
-    const userData = JSON.parse(storageData)
-    setLocalData(userData.user)
+    try {
+      const storageData = localStorage.getItem('@admin-console-user')
+      const userData = JSON.parse(storageData)
+      setLocalData(userData.user)
+
+    } catch (error) {
+      return null
+    }
   }, [])
 
   return (
