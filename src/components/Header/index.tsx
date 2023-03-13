@@ -83,11 +83,16 @@ export function Header() {
   }
 
   useEffect(() => {
-    const storageData = localStorage.getItem('@admin-console-user')
-    const userData = JSON.parse(storageData)
+    try {
+      const storageData = localStorage.getItem('@admin-console-user')
+      const userData = JSON.parse(storageData)
 
-    setUser(userData.user)
-    setPassword(userData.password)
+      setUser(userData.user)
+      setPassword(userData.password)
+
+    } catch (error) {
+      alert('não deu certo fi')
+    }
 
   }, [])
 
