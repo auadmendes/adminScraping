@@ -14,21 +14,20 @@ interface DraftkingsRequest extends NextApiRequest {
 
 export default async function handler(req: DraftkingsRequest, res: NextApiResponse) {
 
-  // const USER_LOGIN = req.body.user
-  // const USER_PASSWORD = req.body.password
+  const USER_LOGIN = req.body.user
+  const USER_PASSWORD = req.body.password
 
-  // let browser = null;
+  let browser = null;
 
-  // const aArray = []
+  const aArray = []
 
-  // req.body.refs.map(item => {
-  //   aArray.push(item[6])
-   
-  // })
+  req.body.refs.map(item => {
+    aArray.push(item[6])
+  })
 
-  // const ptxArray = aArray
+  const ptxArray = aArray
 
-  // const infoArray = []
+  const infoArray = []
 
   // try {
 
@@ -91,9 +90,9 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
   //   }
   // }
 
-  // await browser.close()
+  await browser.close()
 
-  // res.status(201).send(infoArray)
+  res.status(201).send(aArray)
+  //res.status(201).send(infoArray)
 
-  res.status(200).send('olha isso')
 }
