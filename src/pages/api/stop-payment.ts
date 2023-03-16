@@ -50,7 +50,7 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
   
     await page.keyboard.press('Enter', { delay: 100 })
   
-    for (let i = 0; i < ptxArray.length; i++) {
+    for (let i = 0; i < 3; i++) {
         let ref = ptxArray[i]
         let trIds = ''
         let trxType = ''
@@ -100,6 +100,16 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
           return anchors.map((items: { textContent: any; }) => items.textContent).slice(7, 8)
         })
 
+        // console.log(req.body.refs[i][0], '0')
+        // console.log(req.body.refs[i][1], '1')
+        // console.log(req.body.refs[i][2], '2')
+        // console.log(req.body.refs[i][3], '3')
+        // console.log(req.body.refs[i][4], '5')
+        // console.log(req.body.refs[i][5], '5')
+        // console.log(req.body.refs[i][6], '6')
+        // console.log(req.body.refs[i][7], '7')
+        // console.log(req.body.refs[i][8], '8')
+        // console.log(req.body.refs[i][9], '9')
     
         infoArray.push({
           customerName: trustlyUserName[0],
@@ -107,7 +117,7 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
           reason: req.body.refs[i][4] + ' ' + req.body.refs[i][5],
           amount: req.body.refs[i][3],
           pasClerkPtx: ref,
-          refID: req.body.refs[i][6],
+          logRef: req.body.refs[i][9],
           merchantReference: referenceId,
           transactionId: trIds[0],
           signatureRef: signatureRef[0].trim(),
@@ -129,7 +139,6 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
 
   } catch (error) {
     console.log('Olha o erro' + error)
-    //return callback(error);
   } finally {
     if (browser !== null) {
       //await browser.close();
