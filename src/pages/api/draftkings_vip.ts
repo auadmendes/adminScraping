@@ -14,6 +14,8 @@ interface DraftkingsRequest extends NextApiRequest {
 
 export default async function handler(req: DraftkingsRequest, res: NextApiResponse) {
   
+  console.log('before try catch >>>>')
+
   try {
   console.log('Init >>>>')
   const USER_LOGIN = req.body.user
