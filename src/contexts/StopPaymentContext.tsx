@@ -256,6 +256,8 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
 
   async function getDraftkingsVip({ url, mfa, refs, user, password }: ApiProps) {
 
+    console.log('Context > Inside getDraftkingsVip')
+
     const response = await fetch('/api/draftkings_vip', {
       method: 'POST',
       headers: {

@@ -49,6 +49,7 @@ export function Header() {
   function handleApi() {
     if (isChecked) {
       setIsLoading(true)
+      console.log('Header > chose VIP')
       getDraftkingsVip(info)
     } else {
 
