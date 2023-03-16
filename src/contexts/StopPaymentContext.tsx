@@ -260,17 +260,17 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
 
     const response = await fetch('/api/draftkings_vip', {
 
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        url,
-        mfa,
-        refs,
-        user,
-        password
-      })
+      // method: 'POST',
+      // headers: {
+      //   'Content-Type': 'application/json'
+      // },
+      // body: JSON.stringify({
+      //   url,
+      //   mfa,
+      //   refs,
+      //   user,
+      //   password
+      // })
     })
 
     const data = await response.json()
