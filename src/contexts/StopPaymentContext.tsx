@@ -259,6 +259,7 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
     console.log('Context > Inside getDraftkingsVip')
 
     const response = await fetch('/api/draftkings_vip', {
+
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
