@@ -260,6 +260,7 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
 
     const response = await fetch('/api/draftkings_vip', {
 
+
       // method: 'POST',
       // headers: {
       //   'Content-Type': 'application/json'
@@ -272,6 +273,8 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
       //   password
       // })
     })
+
+    console.log('after fetch >>>>')
 
     const data = await response.json()
     setMerchantVip(data)
