@@ -10,7 +10,7 @@ export default function Login() {
   const { push } = useRouter()
 
   function handleLogin() {
-    event.preventDefault()
+    //event.preventDefault()
 
     if (!localData) {
       const userData = {
@@ -35,6 +35,25 @@ export default function Login() {
       setLocalData(null)
     }
   }, [])
+
+
+  useEffect(() => {
+    try {
+      const storageData = localStorage.getItem('@admin-console-user')
+      const userData = JSON.parse(storageData)
+
+      setUserLocal(userData)
+
+      if (userLocal) {
+        push('/')
+      }
+
+    } catch (error) {
+
+    }
+
+  }, [userLocal])
+
 
   return (
     <div className="flex w-full items-center justify-center p-20">
