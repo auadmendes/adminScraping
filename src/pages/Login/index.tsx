@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useRouter } from 'next/navigation'
 
 export default function Login() {
   const [user, setUser] = useState('')
@@ -6,7 +7,7 @@ export default function Login() {
   const [localData, setLocalData] = useState()
 
   const [userLocal, setUserLocal] = useState('')
-  //const [passwordLocal, setPasswordLocal] = useState('')
+  const { push } = useRouter()
 
   function handleLogin() {
     event.preventDefault()
@@ -21,7 +22,7 @@ export default function Login() {
     } else {
       localStorage.removeItem('@admin-console-user')
     }
-
+    push('/')
   }
 
   useEffect(() => {

@@ -121,6 +121,10 @@ export default function Home() {
               </th>
               <th className="bg-gray-700 text-gray-100 p4 text-left text-sm 
               font-bold leading-6" >
+                M. Reference
+              </th>
+              <th className="bg-gray-700 text-gray-100 p4 text-left text-sm 
+              font-bold leading-6" >
                 Amount
               </th>
               <th className="bg-gray-700 text-gray-100 p4 text-left text-sm 
@@ -131,10 +135,10 @@ export default function Home() {
               font-bold leading-6" >
                 Code
               </th>
-              <th className="bg-gray-700 text-gray-100 p4 text-left text-sm font-bold
+              {/* <th className="bg-gray-700 text-gray-100 p4 text-left text-sm font-bold
               leading-6 rounded-tr-lg pr-6" >
                 Log
-              </th>
+              </th> */}
             </tr>
           </thead>
           <tbody>
@@ -147,14 +151,22 @@ export default function Home() {
                   >
                     {item.transactionId}
                   </td>
+
                   <td className="bg-gray-500 border-t-2 border-solid border-gray-[#e1e1e6] 
-                  text-gray-100 text-sm font-bold leading-4 w-1/2">{item.merchantName}</td>
+                  text-gray-100 text-sm font-bold leading-4 ">{item.merchantName}</td>
+
+                  <td className="bg-gray-500 border-t-2 border-solid border-gray-[#e1e1e6] 
+                  text-gray-100 text-sm font-bold leading-4 ">{item.merchantReference}</td>
+
                   <td className="bg-gray-500 border-t-2 border-solid border-gray-[#e1e1e6] 
                   text-gray-100 text-sm font-bold leading-4">{item.amount}</td>
+
                   <td className="bg-gray-500 border-t-2 border-solid border-gray-[#e1e1e6] 
                   text-gray-100 text-sm font-bold leading-4">{item.reason}</td>
+
                   <td className="bg-gray-500 border-t-2 border-solid border-gray-[#e1e1e6] 
                   text-gray-100 text-sm font-bold leading-4">{item.reasonCode}</td>
+
                   <td className="bg-gray-500 border-t-2 border-solid border-gray-[#e1e1e6] 
                   text-gray-100 text-sm font-bold leading-4 w-auto">{item.log}</td>
                 </tr>

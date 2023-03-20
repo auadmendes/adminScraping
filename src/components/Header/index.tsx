@@ -5,6 +5,7 @@ import { TailSpin } from 'react-loader-spinner'
 import { FileArrowDown } from 'phosphor-react'
 import Avatar from "react-avatar"
 import Link from "next/link"
+import { useRouter } from "next/router"
 
 //import XLSX from 'xlsx'
 const XLSX = require('xlsx')
@@ -17,6 +18,8 @@ export function Header() {
   const [isChecked, setIsChecked] = useState(false)
   const [user, setUser] = useState('')
   const [password, setPassword] = useState('')
+
+  const { push } = useRouter()
 
   const {
     readSheet,
@@ -52,7 +55,8 @@ export function Header() {
       console.log('Header > chose VIP')
       getDraftkingsVip(info)
     } else {
-
+      setIsLoading(true)
+      console.log('Header > chose SP')
       getStopPayment(info)
     }
     setMfa('')
@@ -92,7 +96,7 @@ export function Header() {
       setPassword(userData.password)
 
     } catch (error) {
-      alert('não deu certo fi')
+      push('/Login')
     }
 
   }, [])
@@ -189,7 +193,7 @@ export function Header() {
             size="50"
             round={true}
           />
-          Login
+          {user ? user : 'login'}
         </Link>
 
       </div>

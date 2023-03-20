@@ -232,6 +232,7 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
   }
 
   async function getStopPayment({ url, mfa, refs, user, password }: ApiProps) {
+    //console.log('Refs >>> ' + refs)
 
     const response = await fetch('/api/stop-payment', {
       method: 'POST',
@@ -248,6 +249,7 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
     })
 
     const data = await response.json()
+    console.log(data, ' >>>>>>>>>')
     setStopPayment(data)
 
     //console.log('Response Stop Payment.......................................')
@@ -260,21 +262,18 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
 
     const response = await fetch('/api/draftkings_vip', {
 
-
-      // method: 'POST',
-      // headers: {
-      //   'Content-Type': 'application/json'
-      // },
-      // body: JSON.stringify({
-      //   url,
-      //   mfa,
-      //   refs,
-      //   user,
-      //   password
-      // })
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        url,
+        mfa,
+        refs,
+        user,
+        password
+      })
     })
-
-    console.log('after fetch >>>>')
 
     const data = await response.json()
     setMerchantVip(data)

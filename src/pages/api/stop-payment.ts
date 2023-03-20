@@ -34,14 +34,6 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
     //infoArray.push(header)
     
 
-
-    await browser.close()
-
-
-    res.status(201).send(infoArray)
-
-  
-
       const options = await getOptions(true)
       browser = await puppeteer.launch(options)
 
@@ -61,7 +53,7 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
     
       await page.keyboard.press('Enter', { delay: 100 })
     
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < ptxArray.length; i++) {
           let ref = ptxArray[i]
           let trIds = ''
           let trxType = ''
@@ -147,6 +139,10 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
           await ppTransactionId.press('Backspace')
 
       }
+
+
+      await browser.close()
+      res.status(201).send(infoArray)
 
   } catch (error) {
     console.log('Olha o erro' + error)
