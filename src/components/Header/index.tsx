@@ -71,7 +71,7 @@ export function Header() {
 
       XLSX.utils.book_append_sheet(wb, ws, 'Drafkings VIP')
 
-      XLSX.writeFile(wb, 'VIPS.xlsx')
+      XLSX.writeFile(wb, 'Draftkings_VIPS.xlsx')
     } else {
       const wb = XLSX.utils.book_new()
       const ws = XLSX.utils.json_to_sheet(stopPayment)

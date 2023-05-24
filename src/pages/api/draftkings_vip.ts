@@ -55,6 +55,10 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
       await page.keyboard.press('Enter', { delay: 100 })
 
 
+      await page.keyboard.press('Enter', { delay: 100 })
+
+      await page.waitForNavigation()
+
       for (const ref of ptxArray) {
         
         await page.waitForSelector('input[name="ppTransactionId"]')
