@@ -69,7 +69,7 @@ export function Header() {
       const wb = XLSX.utils.book_new()
       const ws = XLSX.utils.json_to_sheet(merchantVip)
 
-      XLSX.utils.book_append_sheet(wb, ws, 'Drafkings VIP')
+      XLSX.utils.book_append_sheet(wb, ws, 'Draftkings VIP')
 
       XLSX.writeFile(wb, 'Draftkings_VIPS.xlsx')
     } else {
