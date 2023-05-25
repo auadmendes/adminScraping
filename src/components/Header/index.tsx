@@ -65,13 +65,17 @@ export function Header() {
   }
 
   function handleDownload() {
+    const day = new Date().getDate()
+    const month = new Date().getMonth() + 1
+    const year = new Date().getFullYear()
+    const today = month + '_' + day + '_' + year
     if (isChecked) {
       const wb = XLSX.utils.book_new()
       const ws = XLSX.utils.json_to_sheet(merchantVip)
 
       XLSX.utils.book_append_sheet(wb, ws, 'Draftkings VIP')
 
-      XLSX.writeFile(wb, 'Draftkings_VIPS.xlsx')
+      XLSX.writeFile(wb, `Draftkings_VIPS_${today}.xlsx`)
     } else {
       const wb = XLSX.utils.book_new()
       const ws = XLSX.utils.json_to_sheet(stopPayment)
