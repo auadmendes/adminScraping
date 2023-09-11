@@ -6,7 +6,7 @@ import { FileArrowDown } from 'phosphor-react'
 import Avatar from "react-avatar"
 import Link from "next/link"
 import { useRouter } from "next/router"
-
+import { useRef } from "react"
 //import XLSX from 'xlsx'
 const XLSX = require('xlsx')
 
@@ -16,17 +16,22 @@ export function Header() {
   const [url, setUrl] = useState('https://paywithmybank.com/admin-console/')
   const [mfa, setMfa] = useState('')
   const [isChecked, setIsChecked] = useState(false)
+  const [isRecoupChecked, setIsRecoupChecked] = useState(false)
   const [user, setUser] = useState('')
   const [password, setPassword] = useState('')
+
+  const checkRef = useRef('SP')
 
   const { push } = useRouter()
 
   const {
     readSheet,
+    readRecoupSheet,
     createFiltered,
     referencePTX,
     getDraftkingsVip,
     getStopPayment,
+    getRecoup,
     merchantVip,
     stopPayment
   } = useContext(StopPaymentContext)
@@ -36,7 +41,11 @@ export function Header() {
 
     if (isChecked) {
       readSheet(file)
-    } else {
+    } else if (isRecoupChecked) {
+      readRecoupSheet(file)
+      //alert('reading recoup file...')
+    }
+    else {
       createFiltered(file)
     }
   }
@@ -54,14 +63,17 @@ export function Header() {
       setIsLoading(true)
       console.log('Header > chose VIP')
       getDraftkingsVip(info)
-    } else {
+    } else if (isRecoupChecked) {
+      //alert('Recoup')
+      //console.log(info.refs)
+      getRecoup(info)
+    }
+    else {
       setIsLoading(true)
       console.log('Header > chose SP')
       getStopPayment(info)
     }
     setMfa('')
-
-
   }
 
   function handleDownload() {
@@ -89,6 +101,9 @@ export function Header() {
 
   function handleCheckBox() {
     setIsChecked(!isChecked)
+  }
+  function handleRecoupCheckBox() {
+    setIsRecoupChecked(!isRecoupChecked)
   }
 
   useEffect(() => {
@@ -167,7 +182,11 @@ export function Header() {
               <label className="block mb-2 text-sm font-medium text-gray-900">Check the box before upload |</label>
               <input type="checkbox" name="Stop Payment" id="SP" checked={isChecked} onChange={handleCheckBox}
                 className="block w-5 h-5 text-md text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 mb-2" />
-              <label> to Draftkings VIPs</label>
+              <label>VIPs</label>
+
+              <input type="checkbox" name="Recoup" id="recoup" checked={isRecoupChecked} onChange={handleRecoupCheckBox}
+                className="block w-5 h-5 text-md text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 mb-2" />
+              <label>Recoup</label>
             </div>
 
             <input

@@ -26,6 +26,7 @@ export default async function handler(req: DraftkingsRequest, res: NextApiRespon
       const aArray = []
 
       req.body.refs.map(item => {
+        //console.log(item[6] + ' tttttttttttttttttttttttttttttt')
         aArray.push(item[6])
       })
 

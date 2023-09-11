@@ -47,10 +47,12 @@ interface StopPaymentContextType {
   merchantVip: Merchant[];
   stopPayment: Merchant[];
   readSheet: (sheet: string) => void;
+  readRecoupSheet: (sheet: string) => void;
   createFiltered: (sheet: string) => void;
   //createVipSheets: (list: string) => void;
   getDraftkingsVip: (data: ApiProps) => void;
   getStopPayment: (data: ApiProps) => void;
+  getRecoup: (data: ApiProps) => void;
 }
 
 
@@ -85,6 +87,23 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
       const data = XLSX.utils.sheet_to_json(ws, { header: 1 })
 
       data.map(item => {
+        // console.log(item[1] + 'kkkkkkkkkkkkkkkkkkkkkkk')
+        if (item[1] === 44048549 || item[1] === 44053920) {
+          //if (item[1] === 44053920) {
+          //console.log(item[9])
+
+          refs.push([
+            [item[0]], // Merchant
+            [item[1]], // Merchant subs_id
+            [item[2]], // Customer name
+            [item[3]], // Amount
+            [item[4]], // Reason
+            [item[5]], // Reason_code
+            [item[8]], // Pas_clerk_ptx
+            [item[9]], // Log
+          ])
+          setReferencePTX([...refs])
+        }
         if (item[1] === 44048549) {
           //console.log(item[9])
 
@@ -107,6 +126,44 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
     reader.readAsBinaryString(sheet);
   }
 
+  //Read recoup
+  function readRecoupSheet(sheet: any) {
+    const reader = new FileReader()
+
+    reader.onload = (evt) => {
+      const bstr = evt.target.result
+      const workbook = XLSX.read(bstr, { type: 'binary' })
+      const ws_name = workbook.SheetNames[0]
+      const ws = workbook.Sheets[ws_name]
+      const data = XLSX.utils.sheet_to_json(ws, { header: 1 })
+
+      // console.log(data)
+
+      data.map(item => {
+
+
+        if (item[9] !== undefined) {
+          console.log(item[9])
+          //console.log(item[2])
+          refs.push([
+            [item[1]], // Customer Id
+            [item[2]], // Transaction ID
+            [item[3]], // Merchatn reference
+            [item[6]], // Amount recovered
+            [item[9]], // Amount recovered
+
+          ])
+          setReferencePTX([...refs])
+
+        }
+      })
+      console.log(referencePTX + '-------')
+    }
+    createFiltered(sheet)
+    //return
+    reader.readAsBinaryString(sheet);
+  }
+
   function createFiltered(sheet: any) {
     //console.log('createFilter' + sheet)
     const reader = new FileReader()
@@ -125,6 +182,7 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
           item[0] !== 'FANDUEL_VIP' &&
           item[0] !== 'LYFT' &&
           item[0] !== 'LYFT' &&
+          //item[0] !== 'LYFT' && colocar outro merchant aqui *
           item[0] !== 'DRAFTKINGS_VIP' &&
           item[5] !== 'R01' &&
           item[5] !== 'I03'
@@ -134,11 +192,11 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
         }
       })
 
-      data.forEach(function (item, index) {
-        if (item[0] === 'DRAFTKINGS_VIP') {
-          arrayDraftkingsVips.push(item)
-        }
-      })
+      // data.forEach(function (item, index) {
+      //   if (item[1] === 44048549) {
+      //     arrayDraftkingsVips.push(item)
+      //   }
+      // })
 
       const firstAndDraftkingsBind = firstFilterStopPayment.concat(arrayDraftkingsVips)
 
@@ -231,6 +289,8 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
     reader.readAsBinaryString(sheet);
   }
 
+
+  //Go to /api/stopPayment to get the data from Admin Console
   async function getStopPayment({ url, mfa, refs, user, password }: ApiProps) {
     //console.log('Refs >>> ' + refs)
 
@@ -256,9 +316,36 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
     console.log(data, ' >>>>>>>>>')
   }
 
-  async function getDraftkingsVip({ url, mfa, refs, user, password }: ApiProps) {
 
-    console.log('Context > Inside getDraftkingsVip')
+  async function getRecoup({ url, mfa, refs, user, password }: ApiProps) {
+
+    const response = await fetch('/api/recoup-payment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        url,
+        mfa,
+        refs,
+        user,
+        password
+      })
+    })
+
+    const data = await response.json()
+    console.log(data, ' RECOUP RECOUP RECOUP RECOUP RECOUP')
+    //return
+    setStopPayment(data)
+
+    //console.log('Response Stop Payment.......................................')
+    console.log(data, ' >>>>>>>>>')
+  }
+
+  //Go to /api/drafkings to get the data from Admin Console
+  async function getDraftkingsVip({ url, mfa, refs, user, password }: ApiProps) {
+    // console.log(refs)
+    // console.log('Context > Inside getDraftkingsVip')
 
     const response = await fetch('/api/draftkings_vip', {
 
@@ -293,8 +380,9 @@ export function StopPaymentProvider({ children }: StopPaymentProviderProps) {
         merchantVip,
         stopPayment,
         readSheet,
+        readRecoupSheet,
         createFiltered,
-        //createVipSheets,
+        getRecoup,
         getDraftkingsVip,
         getStopPayment
       }}
